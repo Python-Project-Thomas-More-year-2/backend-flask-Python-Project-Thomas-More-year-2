@@ -2,6 +2,16 @@
 
 ## Developing
 
+### Python
+
+```bash
+# Install required packages
+python3 -m pip install -r requirements.txt
+
+# Generate requirements.txt
+python3 -m pip freeze > requirements.txt
+```
+
 ### PostgreSQL
 
 ```bash
