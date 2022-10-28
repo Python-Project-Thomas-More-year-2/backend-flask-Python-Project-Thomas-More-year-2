@@ -1,0 +1,91 @@
+import random
+
+from flask import request, session
+from flask_expects_json import expects_json
+from flask_restful import Resource
+
+from models import db, Session, User
+
+schema_post = {
+    "type": "object",
+    "properties": {
+        "user": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 15,
+                    "pattern": "^[a-zA-Z0-9 \\-_+]+$",
+                }
+            },
+            "required": ["name"],
+        },
+    },
+    "required": ["user"],
+}
+
+
+def generate_random_string(n=3):
+    return ''.join(chr(random.randint(65, 90)) for _ in range(n))
+
+
+def generate_session_code():
+    return f"{generate_random_string()}-{generate_random_string()}"
+
+
+class SessionRoute(Resource):
+    @staticmethod
+    @expects_json(schema_post)
+    def post():
+        # Get JSON-data body from request
+        req = request.get_json()
+
+        # Generate connection code and check if a session already exists with this code,
+        # try again if there is a duplicate.
+        code = generate_session_code()
+        duplicate = Session.query.filter_by(code=code).first()
+        while duplicate is not None:
+            code = generate_session_code()
+            duplicate = Session.query.filter_by(code=code).first()
+
+        # Create monopoly-session object
+        ses = Session(
+            code=code,
+            startCapital=1500,
+            seeOthersBalance=True,
+            goReward=200,
+            freeParkingMoney=0,
+            freeParking=True,
+        )
+
+        # Store this monopoly-session-object
+        db.session.add(ses)
+        db.session.commit()
+
+        # Create monopoly-user object
+        user = User(
+            session_id=ses.id,
+            money=0,
+            name=req["user"]["name"],
+            isHost=True,
+            isBank=True,
+        )
+
+        # Store this user
+        db.session.add(user)
+        db.session.commit()
+
+        # Store user-id in flask-session
+        session["user_id"] = user.id
+
+        # Respond
+        return {
+                   "session": {
+                       "id": ses.id,
+                       "code": ses.code,
+                   },
+                   "user": {
+                       "id": user.id,
+                   },
+               }, 201
