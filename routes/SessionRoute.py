@@ -26,6 +26,42 @@ schema_post = {
     "required": ["user"],
 }
 
+schema_patch = {
+    "type": "object",
+    "properties": {
+        "session": {
+            "type": "object",
+            "properties": {
+                "startCapital": {
+                    "type": "integer",
+                    "min": 0,
+                },
+                "seeOthersBalance": {
+                    "type": "boolean",
+                },
+                "goReward": {
+                    "type": "integer",
+                    "min": 0,
+                },
+                "freeParkingMoney": {
+                    "type": "integer",
+                    "min": 0,
+                },
+                "freeParking": {
+                    "type": "boolean",
+                },
+            },
+            "required": [
+                "startCapital",
+                "seeOthersBalance",
+                "goReward",
+                "freeParkingMoney",
+                "freeParking",
+            ],
+        },
+    },
+    "required": ["session"],
+}
 
 def generate_random_string(n=3):
     return ''.join(chr(random.randint(65, 90)) for _ in range(n))
@@ -109,3 +145,35 @@ class SessionRoute(Resource):
                        "id": user.id,
                    },
                }, 201
+    
+    @staticmethod
+    @expects_json(schema_patch)
+    def patch():
+        if session.get("user_id") is None:
+            raise Unauthorized("User does not exist")
+        
+        user: User = User.query.filter_by(id=session["user_id"]).first()
+
+        if user.isHost:
+            req = request.get_json()
+            user.session.startCapital = req["session"]["startCapital"]
+            user.session.seeOthersBalance = req["session"]["seeOthersBalance"]
+            user.session.goReward = req["session"]["goReward"]
+            user.session.freeParkingMoney = req["session"]["freeParkingMoney"]
+            user.session.freeParking = req["session"]["freeParking"]
+
+            db.session.commit()
+
+            return {
+                   "session": {
+                       "startCapital": user.session.startCapital,
+                       "seeOthersBalance": user.session.seeOthersBalance,
+                       "goReward": user.session.goReward,
+                       "freeParkingMoney": user.session.freeParkingMoney,
+                       "freeParking": user.session.freeParking,
+                   }
+               }, 200
+        else:
+            raise Unauthorized("You are not the host")
+
+
