@@ -43,10 +43,6 @@ schema_patch = {
                     "type": "integer",
                     "min": 0,
                 },
-                "freeParkingMoney": {
-                    "type": "integer",
-                    "min": 0,
-                },
                 "freeParking": {
                     "type": "boolean",
                 },
@@ -55,13 +51,13 @@ schema_patch = {
                 "startCapital",
                 "seeOthersBalance",
                 "goReward",
-                "freeParkingMoney",
                 "freeParking",
             ],
         },
     },
     "required": ["session"],
 }
+
 
 def generate_random_string(n=3):
     return ''.join(chr(random.randint(65, 90)) for _ in range(n))
@@ -145,35 +141,37 @@ class SessionRoute(Resource):
                        "id": user.id,
                    },
                }, 201
-    
+
     @staticmethod
     @expects_json(schema_patch)
     def patch():
         if session.get("user_id") is None:
             raise Unauthorized("User does not exist")
-        
+
         user: User = User.query.filter_by(id=session["user_id"]).first()
 
-        if user.isHost:
-            req = request.get_json()
-            user.session.startCapital = req["session"]["startCapital"]
-            user.session.seeOthersBalance = req["session"]["seeOthersBalance"]
-            user.session.goReward = req["session"]["goReward"]
-            user.session.freeParkingMoney = req["session"]["freeParkingMoney"]
-            user.session.freeParking = req["session"]["freeParking"]
-
-            db.session.commit()
-
-            return {
-                   "session": {
-                       "startCapital": user.session.startCapital,
-                       "seeOthersBalance": user.session.seeOthersBalance,
-                       "goReward": user.session.goReward,
-                       "freeParkingMoney": user.session.freeParkingMoney,
-                       "freeParking": user.session.freeParking,
-                   }
-               }, 200
-        else:
+        if not user.isHost:
             raise Unauthorized("You are not the host")
 
+        req = request.get_json()
 
+        user.session.startCapital = req["session"]["startCapital"]
+        user.session.seeOthersBalance = req["session"]["seeOthersBalance"]
+        user.session.goReward = req["session"]["goReward"]
+        user.session.freeParking = req["session"]["freeParking"]
+
+        db.session.commit()
+
+        ses: Session = user.session
+
+        return {
+                   "session": {
+                       "id": ses.id,
+                       "code": ses.code,
+                       "startCapital": ses.startCapital,
+                       "seeOthersBalance": ses.seeOthersBalance,
+                       "goReward": ses.goReward,
+                       "freeParkingMoney": ses.freeParkingMoney,
+                       "freeParking": ses.freeParking,
+                   }
+               }, 200
