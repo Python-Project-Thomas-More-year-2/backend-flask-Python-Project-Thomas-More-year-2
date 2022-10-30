@@ -26,3 +26,4 @@ class User(db.Model):
     isHost = Column(Boolean, nullable=False)
     isBank = Column(Boolean, nullable=False)
     socketSessionId = Column(Integer, nullable=True, unique=True)
+    session = relationship("Session", back_populates="users")

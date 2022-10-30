@@ -3,6 +3,7 @@ import random
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
+from werkzeug.exceptions import Unauthorized
 
 from models import db, Session, User
 
@@ -35,6 +36,25 @@ def generate_session_code():
 
 
 class SessionRoute(Resource):
+    @staticmethod
+    def get():
+        if session.get("user_id") is None:
+            raise Unauthorized("User has no connected session")
+
+        user: User = User.query.filter_by(id=session["user_id"]).first()
+
+        return {
+                   "session": {
+                       "id": user.session.id,
+                       "code": user.session.code,
+                       "startCapital": user.session.startCapital,
+                       "seeOthersBalance": user.session.seeOthersBalance,
+                       "goReward": user.session.goReward,
+                       "freeParkingMoney": user.session.freeParkingMoney,
+                       "freeParking": user.session.freeParking,
+                   }
+               }, 200
+
     @staticmethod
     @expects_json(schema_post)
     def post():
