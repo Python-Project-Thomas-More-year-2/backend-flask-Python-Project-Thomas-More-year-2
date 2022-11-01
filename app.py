@@ -12,7 +12,7 @@ from routes.SessionRoute import SessionRoute
 app = Flask(__name__)
 api = Api(app)
 
-CORS(app, resource={"*": {"origins": "*"}})
+CORS(app, resource={"*": {"origins": "*"}}, supports_credentials=True)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://user:password@127.0.0.1:5432/application"
 app.config["SECRET_KEY"] = "A_SECRET_KEY"  # Change in build
