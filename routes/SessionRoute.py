@@ -136,10 +136,20 @@ class SessionRoute(Resource):
                    "session": {
                        "id": ses.id,
                        "code": ses.code,
+                       "startCapital": ses.startCapital,
+                       "seeOthersBalance": ses.seeOthersBalance,
+                       "goReward": ses.goReward,
+                       "freeParkingMoney": ses.freeParkingMoney,
+                       "freeParking": ses.freeParking
                    },
                    "user": {
                        "id": user.id,
-                   },
+                       "session_id": user.session_id,
+                       "money": user.money,
+                       "name": user.name,
+                       "isHost": user.isHost,
+                       "isBank": user.isBank
+                   }
                }, 201
 
     @staticmethod
