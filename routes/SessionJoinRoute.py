@@ -34,18 +34,19 @@ schema_post = {
     "required": ["user", "session"],
 }
 
-class SessionJoinRoute(Resource):   
+
+class SessionJoinRoute(Resource):
     @staticmethod
     @expects_json(schema_post)
     def post():
         req = request.get_json()
-        session: Session = Session.query.filter_by(code=req["session"]["code"]).first()
+        ses: Session = Session.query.filter_by(code=req["session"]["code"]).first()
 
-        if session is None:
+        if ses is None:
             raise NotFound("Session does not exist")
 
         # Create monopoly-user object
-        user = User (
+        user = User(
             session_id=ses.id,
             money=0,
             name=req["user"]["name"],
@@ -80,12 +81,3 @@ class SessionJoinRoute(Resource):
                        "isBank": user.isBank
                    }
                }, 201
-
-
-
-
-        
-
-
-            
-            
