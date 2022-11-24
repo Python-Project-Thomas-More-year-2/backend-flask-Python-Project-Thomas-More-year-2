@@ -3,15 +3,17 @@ from datetime import timedelta
 from flask import Flask, make_response, jsonify
 from flask_cors import CORS
 from flask_restful import Api
+from flask_socketio import SocketIO, emit
 from jsonschema import ValidationError
 
 from models import db
 from routes.HelloWorld import HelloWorld
-from routes.SessionRoute import SessionRoute
 from routes.SessionJoinRoute import SessionJoinRoute
+from routes.SessionRoute import SessionRoute
 
 app = Flask(__name__)
 api = Api(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 CORS(app, resource={"*": {"origins": "*"}}, supports_credentials=True)
 
@@ -39,5 +41,11 @@ def bad_request(error):
     return error
 
 
+@socketio.on('connect')
+def test_connect():
+    emit('connect', {'data': 'Connected'})
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    # app.run(debug=True)
+    socketio.run(app, debug=True)
