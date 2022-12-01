@@ -25,5 +25,5 @@ class User(db.Model):
     name = Column(db.String(15), nullable=False)
     isHost = Column(Boolean, nullable=False)
     isBank = Column(Boolean, nullable=False)
-    socketSessionId = Column(Integer, nullable=True, unique=True)
+    socketSessionId = Column(String, nullable=True, unique=True)
     session = relationship("Session", back_populates="users")
