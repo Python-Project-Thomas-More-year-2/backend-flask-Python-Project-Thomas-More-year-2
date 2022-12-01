@@ -12,6 +12,7 @@ from routes.HelloWorld import HelloWorld
 from routes.SessionJoinRoute import SessionJoinRoute
 from routes.SessionPlayerList import SessionPlayerList
 from routes.SessionRoute import SessionRoute
+from routes.UserRoute import UserRoute
 
 app = Flask(__name__)
 api = Api(app)
@@ -32,6 +33,7 @@ api.add_resource(HelloWorld, '/')
 api.add_resource(SessionRoute, '/session')
 api.add_resource(SessionPlayerList, '/session/playerlist')
 api.add_resource(SessionJoinRoute, '/session/join')
+api.add_resource(UserRoute, '/user')
 
 
 # https://pypi.org/project/flask-expects-json/#:~:text=register()%3A%0A%20%20%20%20return-,Error%20handling,-On%20validation%20failure

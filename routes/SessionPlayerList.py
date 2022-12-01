@@ -2,7 +2,7 @@ from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
 from flask_socketio import disconnect
-from werkzeug.exceptions import Unauthorized, BadRequest
+from werkzeug.exceptions import BadRequest
 
 from helpers.get_user_by_session import get_user_by_session
 from models import db, User
@@ -31,10 +31,7 @@ class SessionPlayerList(Resource):
         # Get JSON-data body from request
         req = request.get_json()
 
-        user = get_user_by_session(session)
-
-        if user is None:
-            raise Unauthorized("User has no connected session")
+        user = get_user_by_session(session, throw_unauthorized=True)
 
         user.assert_is_host()
 
