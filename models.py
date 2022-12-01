@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
+from werkzeug.exceptions import Unauthorized
 
 db = SQLAlchemy()
 
@@ -27,3 +28,7 @@ class User(db.Model):
     isBank = Column(Boolean, nullable=False)
     socketSessionId = Column(String, nullable=True, unique=True)
     session = relationship("Session", back_populates="users")
+
+    def assert_is_host(self):
+        if not self.isHost:
+            raise Unauthorized("You are not the host")
