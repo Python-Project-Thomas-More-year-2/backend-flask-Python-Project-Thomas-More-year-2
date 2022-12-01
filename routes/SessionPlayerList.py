@@ -1,8 +1,10 @@
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
+from flask_socketio import disconnect
 from werkzeug.exceptions import Unauthorized, BadRequest
 
+from helpers.get_user_by_session import get_user_by_session
 from models import db, User
 
 schema_delete = {
@@ -21,6 +23,7 @@ schema_delete = {
     "required": ["user"],
 }
 
+
 class SessionPlayerList(Resource):
     @staticmethod
     @expects_json(schema_delete)
@@ -28,22 +31,25 @@ class SessionPlayerList(Resource):
         # Get JSON-data body from request
         req = request.get_json()
 
-        if session.get("user_id") is None:
-            raise Unauthorized("User has no connected session")
-
-        user = User.query.filter_by(id=session.get("user_id")).first()     
+        user = get_user_by_session(session)
 
         if user is None:
-            session.pop("user_id")
             raise Unauthorized("User has no connected session")
 
-        if not user.isHost:
-            raise Unauthorized("You are not the host")
+        user.assert_is_host()
 
         if user.id == req["user"]["id"]:
             raise BadRequest("You can not kick yourself")
-            
-        User.query.filter_by(id=req["user"]["id"], session_id=user.session_id).delete()
+
+        query = User.query.filter_by(id=req["user"]["id"], session_id=user.session_id)
+
+        kicked_users = query.all()
+
+        for u in kicked_users:
+            if u.socketSessionId is not None:
+                disconnect(sid=u.socketSessionId, namespace="/")
+
+        query.delete()
         db.session.commit()
 
         users_db = User.query.filter_by(session_id=user.session_id).all()
@@ -51,12 +57,12 @@ class SessionPlayerList(Resource):
 
         for u in users_db:
             users.append({
-                       "id": u.id,
-                       "session_id": u.session_id,
-                       "money": u.money,
-                       "name": u.name,
-                       "isHost": u.isHost,
-                       "isBank": u.isBank
-                   })
-        
+                "id": u.id,
+                "session_id": u.session_id,
+                "money": u.money,
+                "name": u.name,
+                "isHost": u.isHost,
+                "isBank": u.isBank
+            })
+
         return users, 200
