@@ -3,6 +3,8 @@ from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from werkzeug.exceptions import Unauthorized
 
+from helpers.generate_random_string import generate_random_string
+
 db = SQLAlchemy()
 
 
@@ -26,9 +28,19 @@ class User(db.Model):
     name = Column(db.String(15), nullable=False)
     isHost = Column(Boolean, nullable=False)
     isBank = Column(Boolean, nullable=False)
+    socketConnection = Column(db.String(256), unique=True)
     socketSessionId = Column(String, nullable=True, unique=True)
     session = relationship("Session", back_populates="users")
 
     def assert_is_host(self):
         if not self.isHost:
             raise Unauthorized("You are not the host")
+
+    @staticmethod
+    def generate_socket_connection_string() -> str:
+        while True:
+            rand = generate_random_string(256)
+            if User.query.filter_by(socketConnection=rand).first() is None:
+                break
+
+        return rand

@@ -1,10 +1,9 @@
-import random
-
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
 from werkzeug.exceptions import Unauthorized
 
+from helpers.generate_random_string import generate_random_string
 from models import db, Session, User
 
 schema_post = {
@@ -59,10 +58,6 @@ schema_patch = {
 }
 
 
-def generate_random_string(n=3):
-    return ''.join(chr(random.randint(65, 90)) for _ in range(n))
-
-
 def generate_session_code():
     return f"{generate_random_string()}-{generate_random_string()}"
 
@@ -76,16 +71,16 @@ class SessionRoute(Resource):
         user: User = User.query.filter_by(id=session["user_id"]).first()
 
         return {
-                   "session": {
-                       "id": user.session.id,
-                       "code": user.session.code,
-                       "startCapital": user.session.startCapital,
-                       "seeOthersBalance": user.session.seeOthersBalance,
-                       "goReward": user.session.goReward,
-                       "freeParkingMoney": user.session.freeParkingMoney,
-                       "freeParking": user.session.freeParking,
-                   }
-               }, 200
+            "session": {
+                "id": user.session.id,
+                "code": user.session.code,
+                "startCapital": user.session.startCapital,
+                "seeOthersBalance": user.session.seeOthersBalance,
+                "goReward": user.session.goReward,
+                "freeParkingMoney": user.session.freeParkingMoney,
+                "freeParking": user.session.freeParking,
+            }
+        }, 200
 
     @staticmethod
     @expects_json(schema_post)
@@ -122,6 +117,7 @@ class SessionRoute(Resource):
             name=req["user"]["name"],
             isHost=True,
             isBank=True,
+            socketConnection=User.generate_socket_connection_string()
         )
 
         # Store this user
@@ -133,24 +129,25 @@ class SessionRoute(Resource):
 
         # Respond
         return {
-                   "session": {
-                       "id": ses.id,
-                       "code": ses.code,
-                       "startCapital": ses.startCapital,
-                       "seeOthersBalance": ses.seeOthersBalance,
-                       "goReward": ses.goReward,
-                       "freeParkingMoney": ses.freeParkingMoney,
-                       "freeParking": ses.freeParking
-                   },
-                   "user": {
-                       "id": user.id,
-                       "session_id": user.session_id,
-                       "money": user.money,
-                       "name": user.name,
-                       "isHost": user.isHost,
-                       "isBank": user.isBank
-                   }
-               }, 201
+            "session": {
+                "id": ses.id,
+                "code": ses.code,
+                "startCapital": ses.startCapital,
+                "seeOthersBalance": ses.seeOthersBalance,
+                "goReward": ses.goReward,
+                "freeParkingMoney": ses.freeParkingMoney,
+                "freeParking": ses.freeParking
+            },
+            "user": {
+                "id": user.id,
+                "session_id": user.session_id,
+                "money": user.money,
+                "name": user.name,
+                "isHost": user.isHost,
+                "isBank": user.isBank,
+                "socketConnection": user.socketConnection,
+            }
+        }, 201
 
     @staticmethod
     @expects_json(schema_patch)
@@ -175,13 +172,13 @@ class SessionRoute(Resource):
         ses: Session = user.session
 
         return {
-                   "session": {
-                       "id": ses.id,
-                       "code": ses.code,
-                       "startCapital": ses.startCapital,
-                       "seeOthersBalance": ses.seeOthersBalance,
-                       "goReward": ses.goReward,
-                       "freeParkingMoney": ses.freeParkingMoney,
-                       "freeParking": ses.freeParking,
-                   }
-               }, 200
+            "session": {
+                "id": ses.id,
+                "code": ses.code,
+                "startCapital": ses.startCapital,
+                "seeOthersBalance": ses.seeOthersBalance,
+                "goReward": ses.goReward,
+                "freeParkingMoney": ses.freeParkingMoney,
+                "freeParking": ses.freeParking,
+            }
+        }, 200

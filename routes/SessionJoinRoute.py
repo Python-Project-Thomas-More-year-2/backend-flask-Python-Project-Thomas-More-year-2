@@ -52,6 +52,7 @@ class SessionJoinRoute(Resource):
             name=req["user"]["name"],
             isHost=False,
             isBank=False,
+            socketConnection=User.generate_socket_connection_string()
         )
 
         # Store this user
@@ -63,21 +64,22 @@ class SessionJoinRoute(Resource):
 
         # Respond
         return {
-                   "session": {
-                       "id": ses.id,
-                       "code": ses.code,
-                       "startCapital": ses.startCapital,
-                       "seeOthersBalance": ses.seeOthersBalance,
-                       "goReward": ses.goReward,
-                       "freeParkingMoney": ses.freeParkingMoney,
-                       "freeParking": ses.freeParking
-                   },
-                   "user": {
-                       "id": user.id,
-                       "session_id": user.session_id,
-                       "money": user.money,
-                       "name": user.name,
-                       "isHost": user.isHost,
-                       "isBank": user.isBank
-                   }
-               }, 201
+            "session": {
+                "id": ses.id,
+                "code": ses.code,
+                "startCapital": ses.startCapital,
+                "seeOthersBalance": ses.seeOthersBalance,
+                "goReward": ses.goReward,
+                "freeParkingMoney": ses.freeParkingMoney,
+                "freeParking": ses.freeParking
+            },
+            "user": {
+                "id": user.id,
+                "session_id": user.session_id,
+                "money": user.money,
+                "name": user.name,
+                "isHost": user.isHost,
+                "isBank": user.isBank,
+                "socketConnection": user.socketConnection,
+            }
+        }, 201
