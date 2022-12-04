@@ -34,14 +34,14 @@ schema_patch = {
             "properties": {
                 "startCapital": {
                     "type": "integer",
-                    "min": 0,
+                    "minimum": 0,
                 },
                 "seeOthersBalance": {
                     "type": "boolean",
                 },
                 "goReward": {
                     "type": "integer",
-                    "min": 0,
+                    "minimum": 0,
                 },
                 "freeParking": {
                     "type": "boolean",
