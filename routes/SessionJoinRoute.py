@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, Conflict
 
 from models import db, Session, User
 
@@ -45,6 +45,10 @@ class SessionJoinRoute(Resource):
         if ses is None:
             raise NotFound("Session does not exist")
 
+        duplicate_name_user: User = User.query.filter_by(name=req["user"]["name"], session_id=ses.id).first()
+        if duplicate_name_user is not None:
+            raise Conflict("A user with that name already exists")
+
         # Create monopoly-user object
         user = User(
             session_id=ses.id,
@@ -52,6 +56,7 @@ class SessionJoinRoute(Resource):
             name=req["user"]["name"],
             isHost=False,
             isBank=False,
+            socketConnection=User.generate_socket_connection_string()
         )
 
         # Store this user
@@ -63,21 +68,22 @@ class SessionJoinRoute(Resource):
 
         # Respond
         return {
-                   "session": {
-                       "id": ses.id,
-                       "code": ses.code,
-                       "startCapital": ses.startCapital,
-                       "seeOthersBalance": ses.seeOthersBalance,
-                       "goReward": ses.goReward,
-                       "freeParkingMoney": ses.freeParkingMoney,
-                       "freeParking": ses.freeParking
-                   },
-                   "user": {
-                       "id": user.id,
-                       "session_id": user.session_id,
-                       "money": user.money,
-                       "name": user.name,
-                       "isHost": user.isHost,
-                       "isBank": user.isBank
-                   }
-               }, 201
+            "session": {
+                "id": ses.id,
+                "code": ses.code,
+                "startCapital": ses.startCapital,
+                "seeOthersBalance": ses.seeOthersBalance,
+                "goReward": ses.goReward,
+                "freeParkingMoney": ses.freeParkingMoney,
+                "freeParking": ses.freeParking
+            },
+            "user": {
+                "id": user.id,
+                "session_id": user.session_id,
+                "money": user.money,
+                "name": user.name,
+                "isHost": user.isHost,
+                "isBank": user.isBank,
+                "socketConnection": user.socketConnection,
+            }
+        }, 201

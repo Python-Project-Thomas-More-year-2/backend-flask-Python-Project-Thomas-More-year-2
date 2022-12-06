@@ -10,12 +10,13 @@ class UserRoute(Resource):
         user = get_user_by_session(session, throw_unauthorized=True)
 
         return {
-                   "user": {
-                       "id": user.id,
-                       "session_id": user.session_id,
-                       "money": user.money,
-                       "name": user.name,
-                       "isHost": user.isHost,
-                       "isBank": user.isBank
-                   }
-               }, 200
+            "user": {
+                "id": user.id,
+                "session_id": user.session_id,
+                "money": user.money,
+                "name": user.name,
+                "isHost": user.isHost,
+                "isBank": user.isBank,
+                "socketConnection": user.socketConnection,
+            }
+        }, 200
