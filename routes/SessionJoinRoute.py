@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, Conflict
 
 from models import db, Session, User
 
@@ -44,6 +44,10 @@ class SessionJoinRoute(Resource):
 
         if ses is None:
             raise NotFound("Session does not exist")
+
+        duplicate_name_user: User = User.query.filter_by(name=req["user"]["name"], session_id=ses.id).first()
+        if duplicate_name_user is not None:
+            raise Conflict("A user with that name already exists")
 
         # Create monopoly-user object
         user = User(

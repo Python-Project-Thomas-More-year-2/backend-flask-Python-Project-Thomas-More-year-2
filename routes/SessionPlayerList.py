@@ -63,3 +63,22 @@ class SessionPlayerList(Resource):
             })
 
         return users, 200
+
+    @staticmethod
+    def get():
+        user = get_user_by_session(session, throw_unauthorized=True)
+
+        users_db = User.query.filter_by(session_id=user.session_id).all()
+        users = []
+
+        for u in users_db:
+            users.append({
+                "id": u.id,
+                "session_id": u.session_id,
+                "money": u.money,
+                "name": u.name,
+                "isHost": u.isHost,
+                "isBank": u.isBank
+            })
+
+        return users, 200
