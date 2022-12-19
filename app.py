@@ -97,9 +97,20 @@ def auth(json):
 @socketio.on('disconnect')
 def disconnect():
     user_prev_connection: User | None = User.query.filter_by(socketSessionId=request.sid).first()
-    if user_prev_connection is not None:
-        user_prev_connection.socketSessionId = None
-        db.session.commit()
+
+    if user_prev_connection is None:
+        return
+
+    user_prev_connection.socketSessionId = None
+    db.session.commit()
+
+    u: User
+    for u in User.query.filter_by(session_id=user_prev_connection.session_id).all():
+        emit("user-disconnect", {
+            "user": {
+                "id": user_prev_connection.id,
+            }
+        }, to=u.socketSessionId)
 
 
 if __name__ == "__main__":
