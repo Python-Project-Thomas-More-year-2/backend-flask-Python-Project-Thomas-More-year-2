@@ -37,7 +37,7 @@ class User(db.Model):
         if not self.isHost:
             raise Unauthorized("You are not the host")
 
-    def disconnectSocket(self):
+    def disconnect_socket(self):
         if self.socketSessionId is not None:
             disconnect(sid=self.socketSessionId, namespace="/")
 

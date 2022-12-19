@@ -194,12 +194,12 @@ class SessionRoute(Resource):
             kicked_users = query.all()
 
             for u in kicked_users:
-                u.disconnectSocket()
+                u.disconnect_socket()
 
             query.delete()
             db.session.delete(ses)
         else:
-            user.disconnectSocket()
+            user.disconnect_socket()
 
             db.session.delete(user)
 
