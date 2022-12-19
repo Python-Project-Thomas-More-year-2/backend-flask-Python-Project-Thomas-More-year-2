@@ -1,9 +1,11 @@
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
+from flask_socketio import disconnect
 from werkzeug.exceptions import Unauthorized
 
 from helpers.generate_random_string import generate_random_string
+from helpers.get_user_by_session import get_user_by_session
 from models import db, Session, User
 
 schema_post = {
@@ -182,3 +184,29 @@ class SessionRoute(Resource):
                 "freeParking": ses.freeParking,
             }
         }, 200
+
+    @staticmethod
+    def delete():
+        user = get_user_by_session(session, throw_unauthorized=True)
+
+        if user.isHost:
+            ses = user.session
+            query = User.query.filter_by(session_id=user.session_id)
+            kicked_users = query.all()
+
+            for u in kicked_users:
+                if u.socketSessionId is not None:
+                    disconnect(sid=u.socketSessionId, namespace="/")
+
+            query.delete()
+            db.session.delete(ses)
+        else:
+            if user.socketSessionId is not None:
+                disconnect(sid=user.socketSessionId, namespace="/")
+
+            db.session.delete(user)
+
+        db.session.commit()
+        session.pop("user_id")
+
+        return {}, 204
