@@ -4,6 +4,7 @@ from flask_restful import Resource
 from werkzeug.exceptions import Unauthorized
 
 from helpers.generate_random_string import generate_random_string
+from helpers.get_user_by_session import get_user_by_session
 from models import db, Session, User
 
 schema_post = {
@@ -182,3 +183,27 @@ class SessionRoute(Resource):
                 "freeParking": ses.freeParking,
             }
         }, 200
+
+    @staticmethod
+    def delete():
+        user = get_user_by_session(session, throw_unauthorized=True)
+
+        if user.isHost:
+            ses = user.session
+            query = User.query.filter_by(session_id=user.session_id)
+            kicked_users = query.all()
+
+            for u in kicked_users:
+                u.disconnectSocket()
+
+            query.delete()
+            db.session.delete(ses)
+        else:
+            user.disconnectSocket()
+
+            db.session.delete(user)
+
+        db.session.commit()
+        session.pop("user_id")
+
+        return {}, 204
