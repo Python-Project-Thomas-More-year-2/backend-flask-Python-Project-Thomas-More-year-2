@@ -82,6 +82,14 @@ def auth(json):
     user.socketSessionId = request.sid
     db.session.commit()
 
+    u: User
+    for u in User.query.filter_by(session_id=user.session_id).all():
+        emit("user-connect", {
+            "user": {
+                "id": user.id,
+            }
+        }, to=u.socketSessionId)
+
     emit("auth-res", {
         "message": "connected to session"
     })
