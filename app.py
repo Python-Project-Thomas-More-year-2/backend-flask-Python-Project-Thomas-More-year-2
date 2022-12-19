@@ -81,13 +81,11 @@ def auth(json):
     user.socketSessionId = request.sid
     db.session.commit()
 
-    u: User
-    for u in User.query.filter_by(session_id=user.session_id).all():
-        emit("user-connect", {
-            "user": {
-                "id": user.id,
-            }
-        }, to=u.socketSessionId)
+    user.emit_to_session("user-connect", {
+        "user": {
+            "id": user.id,
+        }
+    })
 
     emit("auth-res", {
         "message": "connected to session"
@@ -104,13 +102,11 @@ def disconnect():
     user_prev_connection.socketSessionId = None
     db.session.commit()
 
-    u: User
-    for u in User.query.filter_by(session_id=user_prev_connection.session_id).all():
-        emit("user-disconnect", {
-            "user": {
-                "id": user_prev_connection.id,
-            }
-        }, to=u.socketSessionId)
+    user_prev_connection.emit_to_session("user-disconnect", {
+        "user": {
+            "id": user_prev_connection.id,
+        }
+    })
 
 
 if __name__ == "__main__":
