@@ -1,7 +1,6 @@
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
-from flask_socketio import disconnect
 from werkzeug.exceptions import Unauthorized
 
 from helpers.generate_random_string import generate_random_string
@@ -195,14 +194,12 @@ class SessionRoute(Resource):
             kicked_users = query.all()
 
             for u in kicked_users:
-                if u.socketSessionId is not None:
-                    disconnect(sid=u.socketSessionId, namespace="/")
+                u.disconnectSocket()
 
             query.delete()
             db.session.delete(ses)
         else:
-            if user.socketSessionId is not None:
-                disconnect(sid=user.socketSessionId, namespace="/")
+            user.disconnectSocket()
 
             db.session.delete(user)
 
