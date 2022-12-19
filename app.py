@@ -1,12 +1,11 @@
 from datetime import timedelta
 
-from flask import Flask, make_response, jsonify, session, request
+from flask import Flask, make_response, jsonify, request
 from flask_cors import CORS
 from flask_restful import Api
 from flask_socketio import SocketIO, emit
 from jsonschema import ValidationError
 
-from helpers.get_user_by_session import get_user_by_session
 from models import db, User
 from routes.HelloWorld import HelloWorld
 from routes.SessionJoinRoute import SessionJoinRoute
@@ -82,6 +81,12 @@ def auth(json):
     user.socketSessionId = request.sid
     db.session.commit()
 
+    user.emit_to_session("user-connect", {
+        "user": {
+            "id": user.id,
+        }
+    })
+
     emit("auth-res", {
         "message": "connected to session"
     })
@@ -89,11 +94,19 @@ def auth(json):
 
 @socketio.on('disconnect')
 def disconnect():
-    user = get_user_by_session(session)
+    user_prev_connection: User | None = User.query.filter_by(socketSessionId=request.sid).first()
 
-    if user is not None:
-        user.socketSessionId = None
-        db.session.commit()
+    if user_prev_connection is None:
+        return
+
+    user_prev_connection.socketSessionId = None
+    db.session.commit()
+
+    user_prev_connection.emit_to_session("user-disconnect", {
+        "user": {
+            "id": user_prev_connection.id,
+        }
+    })
 
 
 if __name__ == "__main__":

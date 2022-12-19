@@ -1,7 +1,7 @@
+from flask_socketio import disconnect, emit
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from flask_socketio import disconnect
 from werkzeug.exceptions import Unauthorized
 
 from helpers.generate_random_string import generate_random_string
@@ -37,9 +37,15 @@ class User(db.Model):
         if not self.isHost:
             raise Unauthorized("You are not the host")
 
-    def disconnectSocket(self):
+    def disconnect_socket(self):
         if self.socketSessionId is not None:
             disconnect(sid=self.socketSessionId, namespace="/")
+
+    def emit_to_session(self, event: str, data: dir):
+        u: User
+        for u in User.query.filter_by(session_id=self.session_id).all():
+            if u.socketSessionId is not None:
+                emit(event, data, to=u.socketSessionId)
 
     @staticmethod
     def generate_socket_connection_string() -> str:
