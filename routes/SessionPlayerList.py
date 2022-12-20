@@ -59,7 +59,6 @@ class SessionPlayerList(Resource):
                 "money": u.money,
                 "name": u.name,
                 "isHost": u.isHost,
-                "isBank": u.isBank
             })
 
         for u in kicked_users:
@@ -85,7 +84,6 @@ class SessionPlayerList(Resource):
                 "money": u.money,
                 "name": u.name,
                 "isHost": u.isHost,
-                "isBank": u.isBank,
                 "socketConnection": u.socketSessionId,
             })
 

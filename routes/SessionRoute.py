@@ -114,7 +114,6 @@ class SessionRoute(Resource):
             money=0,
             name=req["user"]["name"],
             isHost=True,
-            isBank=True,
             socketConnection=User.generate_socket_connection_string()
         )
 
@@ -142,7 +141,6 @@ class SessionRoute(Resource):
                 "money": user.money,
                 "name": user.name,
                 "isHost": user.isHost,
-                "isBank": user.isBank,
                 "socketConnection": user.socketConnection,
             }
         }, 201

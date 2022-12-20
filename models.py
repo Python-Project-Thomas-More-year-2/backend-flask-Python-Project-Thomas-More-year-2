@@ -28,7 +28,6 @@ class User(db.Model):
     money = Column(Integer, nullable=False)
     name = Column(db.String(15), nullable=False)
     isHost = Column(Boolean, nullable=False)
-    isBank = Column(Boolean, nullable=False)
     socketConnection = Column(db.String(256), unique=True)
     socketSessionId = Column(String, nullable=True, unique=True)
     session = relationship("Session", back_populates="users")

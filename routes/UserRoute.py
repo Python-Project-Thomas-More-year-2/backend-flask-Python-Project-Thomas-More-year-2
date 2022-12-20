@@ -16,7 +16,6 @@ class UserRoute(Resource):
                 "money": user.money,
                 "name": user.name,
                 "isHost": user.isHost,
-                "isBank": user.isBank,
                 "socketConnection": user.socketConnection,
             }
         }, 200
