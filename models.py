@@ -16,8 +16,6 @@ class Session(db.Model):
     startCapital = Column(Integer, nullable=False)
     seeOthersBalance = Column(Boolean, nullable=False)
     goReward = Column(Integer, nullable=False)
-    freeParkingMoney = Column(Integer, nullable=False)
-    freeParking = Column(Boolean, nullable=False)
     started = Column(Boolean, nullable=False, default=False)
     users = relationship("User")
 
@@ -46,7 +44,7 @@ class User(db.Model):
         for u in User.query.filter_by(session_id=self.session_id).all():
             if u.socketSessionId is not None:
                 emit(event, data, to=u.socketSessionId, namespace="/")
-    
+
     def emit(self, event: str, data: dir):
         if self.socketSessionId is not None:
             emit(event, data, to=self.socketSessionId, namespace="/")

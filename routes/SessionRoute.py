@@ -43,15 +43,11 @@ schema_patch = {
                     "type": "integer",
                     "minimum": 0,
                 },
-                "freeParking": {
-                    "type": "boolean",
-                },
             },
             "required": [
                 "startCapital",
                 "seeOthersBalance",
                 "goReward",
-                "freeParking",
             ],
         },
     },
@@ -75,8 +71,6 @@ class SessionRoute(Resource):
                 "startCapital": user.session.startCapital,
                 "seeOthersBalance": user.session.seeOthersBalance,
                 "goReward": user.session.goReward,
-                "freeParkingMoney": user.session.freeParkingMoney,
-                "freeParking": user.session.freeParking,
                 "started": user.session.started,
             }
         }, 200
@@ -100,9 +94,7 @@ class SessionRoute(Resource):
             code=code,
             startCapital=1500,
             seeOthersBalance=True,
-            goReward=200,
-            freeParkingMoney=0,
-            freeParking=True,
+            goReward=200
         )
 
         # Store this monopoly-session-object
@@ -133,8 +125,6 @@ class SessionRoute(Resource):
                 "startCapital": ses.startCapital,
                 "seeOthersBalance": ses.seeOthersBalance,
                 "goReward": ses.goReward,
-                "freeParkingMoney": ses.freeParkingMoney,
-                "freeParking": ses.freeParking,
                 "started": ses.started,
             },
             "user": {
@@ -154,14 +144,14 @@ class SessionRoute(Resource):
         user.assert_is_host()
 
         if user.session.started:
-            raise Conflict("You cannot change the settings of a session once it has already started")
+            raise Conflict(
+                "You cannot change the settings of a session once it has already started")
 
         req = request.get_json()
 
         user.session.startCapital = req["session"]["startCapital"]
         user.session.seeOthersBalance = req["session"]["seeOthersBalance"]
         user.session.goReward = req["session"]["goReward"]
-        user.session.freeParking = req["session"]["freeParking"]
 
         db.session.commit()
         user.emit_to_session("session-settings-update", {})
@@ -175,8 +165,6 @@ class SessionRoute(Resource):
                 "startCapital": ses.startCapital,
                 "seeOthersBalance": ses.seeOthersBalance,
                 "goReward": ses.goReward,
-                "freeParkingMoney": ses.freeParkingMoney,
-                "freeParking": ses.freeParking,
                 "started": ses.started,
             }
         }, 200

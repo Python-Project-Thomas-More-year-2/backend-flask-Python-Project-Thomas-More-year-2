@@ -40,12 +40,14 @@ class SessionJoinRoute(Resource):
     @expects_json(schema_post)
     def post():
         req = request.get_json()
-        ses: Session = Session.query.filter_by(code=req["session"]["code"]).first()
+        ses: Session = Session.query.filter_by(
+            code=req["session"]["code"]).first()
 
         if ses is None:
             raise NotFound("Session does not exist")
 
-        duplicate_name_user: User = User.query.filter_by(name=req["user"]["name"], session_id=ses.id).first()
+        duplicate_name_user: User = User.query.filter_by(
+            name=req["user"]["name"], session_id=ses.id).first()
         if duplicate_name_user is not None:
             raise Conflict("A user with that name already exists")
 
@@ -73,8 +75,6 @@ class SessionJoinRoute(Resource):
                 "startCapital": ses.startCapital,
                 "seeOthersBalance": ses.seeOthersBalance,
                 "goReward": ses.goReward,
-                "freeParkingMoney": ses.freeParkingMoney,
-                "freeParking": ses.freeParking,
                 "started": ses.started,
             },
             "user": {
