@@ -1,6 +1,7 @@
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
+from werkzeug.exceptions import Conflict
 
 from helpers.get_user_by_session import get_user_by_session
 from models import Session, User, db
@@ -33,12 +34,24 @@ class GameGo(Resource):
 
         u = User.query.filter_by(id=req["user"]["id"], session_id=user.session_id).first()
 
+        if u is None:
+            raise Conflict("u no existio")
+
+        if not u.session.started:
+            raise Conflict("Session has not started yet")
+
         u.money += u.session.goReward
         db.session.commit()
 
         if u.session.seeOthersBalance:
-            user.emit_to_session('money change', u.money)
+            user.emit_to_session('user-balance-update', {
+                "user": {
+                    "id": u.id
+                }})
         else:
-            user.emit('money change', u.money)
+            user.emit('user-balance-update', {
+                "user": {
+                    "id": u.id
+                }})
 
         return {}, 200
