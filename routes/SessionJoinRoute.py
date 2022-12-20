@@ -74,7 +74,8 @@ class SessionJoinRoute(Resource):
                 "seeOthersBalance": ses.seeOthersBalance,
                 "goReward": ses.goReward,
                 "freeParkingMoney": ses.freeParkingMoney,
-                "freeParking": ses.freeParking
+                "freeParking": ses.freeParking,
+                "started": ses.started,
             },
             "user": {
                 "id": user.id,

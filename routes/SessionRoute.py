@@ -77,6 +77,7 @@ class SessionRoute(Resource):
                 "goReward": user.session.goReward,
                 "freeParkingMoney": user.session.freeParkingMoney,
                 "freeParking": user.session.freeParking,
+                "started": user.session.started,
             }
         }, 200
 
@@ -133,7 +134,8 @@ class SessionRoute(Resource):
                 "seeOthersBalance": ses.seeOthersBalance,
                 "goReward": ses.goReward,
                 "freeParkingMoney": ses.freeParkingMoney,
-                "freeParking": ses.freeParking
+                "freeParking": ses.freeParking,
+                "started": ses.started,
             },
             "user": {
                 "id": user.id,
@@ -176,6 +178,7 @@ class SessionRoute(Resource):
                 "goReward": ses.goReward,
                 "freeParkingMoney": ses.freeParkingMoney,
                 "freeParking": ses.freeParking,
+                "started": ses.started,
             }
         }, 200
 

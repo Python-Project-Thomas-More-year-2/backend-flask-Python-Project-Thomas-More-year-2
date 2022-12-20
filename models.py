@@ -18,6 +18,7 @@ class Session(db.Model):
     goReward = Column(Integer, nullable=False)
     freeParkingMoney = Column(Integer, nullable=False)
     freeParking = Column(Boolean, nullable=False)
+    started = Column(Boolean, nullable=False, default=False)
     users = relationship("User")
 
 
