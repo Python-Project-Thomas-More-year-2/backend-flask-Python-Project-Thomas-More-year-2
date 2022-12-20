@@ -45,7 +45,7 @@ class User(db.Model):
         u: User
         for u in User.query.filter_by(session_id=self.session_id).all():
             if u.socketSessionId is not None:
-                emit(event, data, to=u.socketSessionId)
+                emit(event, data, to=u.socketSessionId, namespace="/")
 
     @staticmethod
     def generate_socket_connection_string() -> str:

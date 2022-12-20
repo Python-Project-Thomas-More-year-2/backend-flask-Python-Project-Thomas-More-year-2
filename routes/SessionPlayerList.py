@@ -62,6 +62,13 @@ class SessionPlayerList(Resource):
                 "isBank": u.isBank
             })
 
+        for u in kicked_users:
+            user.emit_to_session("user-disconnect", {
+                "user": {
+                    "id": u.id,
+                }
+            })
+
         return users, 200
 
     @staticmethod
@@ -78,7 +85,8 @@ class SessionPlayerList(Resource):
                 "money": u.money,
                 "name": u.name,
                 "isHost": u.isHost,
-                "isBank": u.isBank
+                "isBank": u.isBank,
+                "socketConnection": u.socketSessionId,
             })
 
         return users, 200

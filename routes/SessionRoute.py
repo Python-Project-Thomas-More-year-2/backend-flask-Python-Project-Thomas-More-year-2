@@ -66,10 +66,7 @@ def generate_session_code():
 class SessionRoute(Resource):
     @staticmethod
     def get():
-        if session.get("user_id") is None:
-            raise Unauthorized("User has no connected session")
-
-        user: User = User.query.filter_by(id=session["user_id"]).first()
+        user = get_user_by_session(session, True)
 
         return {
             "session": {
