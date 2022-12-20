@@ -78,7 +78,8 @@ class SessionPlayerList(Resource):
                 "money": u.money,
                 "name": u.name,
                 "isHost": u.isHost,
-                "isBank": u.isBank
+                "isBank": u.isBank,
+                "socketConnection": u.socketSessionId,
             })
 
         return users, 200
