@@ -46,6 +46,12 @@ class User(db.Model):
         for u in User.query.filter_by(session_id=self.session_id).all():
             if u.socketSessionId is not None:
                 emit(event, data, to=u.socketSessionId)
+    
+    def emit(self, event: str, data: dir):
+        u: User
+        u = User.query.filter_by(id=self.id).first()
+        if u.socketSessionId is not None:
+            emit(event, data, to=u.socketSessionId)
 
     @staticmethod
     def generate_socket_connection_string() -> str:
