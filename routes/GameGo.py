@@ -35,7 +35,7 @@ class GameGo(Resource):
         u = User.query.filter_by(id=req["user"]["id"], session_id=user.session_id).first()
 
         if u is None:
-            raise Conflict("u no existio")
+            raise Conflict("User does not exist")
 
         if not u.session.started:
             raise Conflict("Session has not started yet")
