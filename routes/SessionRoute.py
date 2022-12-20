@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
-from werkzeug.exceptions import Unauthorized
+from werkzeug.exceptions import Conflict
 
 from helpers.generate_random_string import generate_random_string
 from helpers.get_user_by_session import get_user_by_session
@@ -150,13 +150,11 @@ class SessionRoute(Resource):
     @staticmethod
     @expects_json(schema_patch)
     def patch():
-        if session.get("user_id") is None:
-            raise Unauthorized("User does not exist")
+        user = get_user_by_session(session, True)
+        user.assert_is_host()
 
-        user: User = User.query.filter_by(id=session["user_id"]).first()
-
-        if not user.isHost:
-            raise Unauthorized("You are not the host")
+        if user.session.started:
+            raise Conflict("You cannot change the settings of a session once it has already started")
 
         req = request.get_json()
 
