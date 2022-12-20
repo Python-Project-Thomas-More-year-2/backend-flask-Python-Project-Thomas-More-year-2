@@ -164,6 +164,7 @@ class SessionRoute(Resource):
         user.session.freeParking = req["session"]["freeParking"]
 
         db.session.commit()
+        user.emit_to_session("session-settings-update", {})
 
         ses: Session = user.session
 
