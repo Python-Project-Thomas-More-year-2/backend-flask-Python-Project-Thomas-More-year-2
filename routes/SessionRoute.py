@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
-from werkzeug.exceptions import Unauthorized
+from werkzeug.exceptions import Conflict
 
 from helpers.generate_random_string import generate_random_string
 from helpers.get_user_by_session import get_user_by_session
@@ -66,10 +66,7 @@ def generate_session_code():
 class SessionRoute(Resource):
     @staticmethod
     def get():
-        if session.get("user_id") is None:
-            raise Unauthorized("User has no connected session")
-
-        user: User = User.query.filter_by(id=session["user_id"]).first()
+        user = get_user_by_session(session, True)
 
         return {
             "session": {
@@ -80,6 +77,7 @@ class SessionRoute(Resource):
                 "goReward": user.session.goReward,
                 "freeParkingMoney": user.session.freeParkingMoney,
                 "freeParking": user.session.freeParking,
+                "started": user.session.started,
             }
         }, 200
 
@@ -117,7 +115,6 @@ class SessionRoute(Resource):
             money=0,
             name=req["user"]["name"],
             isHost=True,
-            isBank=True,
             socketConnection=User.generate_socket_connection_string()
         )
 
@@ -137,7 +134,8 @@ class SessionRoute(Resource):
                 "seeOthersBalance": ses.seeOthersBalance,
                 "goReward": ses.goReward,
                 "freeParkingMoney": ses.freeParkingMoney,
-                "freeParking": ses.freeParking
+                "freeParking": ses.freeParking,
+                "started": ses.started,
             },
             "user": {
                 "id": user.id,
@@ -145,7 +143,6 @@ class SessionRoute(Resource):
                 "money": user.money,
                 "name": user.name,
                 "isHost": user.isHost,
-                "isBank": user.isBank,
                 "socketConnection": user.socketConnection,
             }
         }, 201
@@ -153,13 +150,11 @@ class SessionRoute(Resource):
     @staticmethod
     @expects_json(schema_patch)
     def patch():
-        if session.get("user_id") is None:
-            raise Unauthorized("User does not exist")
+        user = get_user_by_session(session, True)
+        user.assert_is_host()
 
-        user: User = User.query.filter_by(id=session["user_id"]).first()
-
-        if not user.isHost:
-            raise Unauthorized("You are not the host")
+        if user.session.started:
+            raise Conflict("You cannot change the settings of a session once it has already started")
 
         req = request.get_json()
 
@@ -181,6 +176,7 @@ class SessionRoute(Resource):
                 "goReward": ses.goReward,
                 "freeParkingMoney": ses.freeParkingMoney,
                 "freeParking": ses.freeParking,
+                "started": ses.started,
             }
         }, 200
 

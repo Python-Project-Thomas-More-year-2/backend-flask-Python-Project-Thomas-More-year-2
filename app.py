@@ -7,6 +7,7 @@ from flask_socketio import SocketIO, emit
 from jsonschema import ValidationError
 
 from models import db, User
+from routes.SessionStartRoute import SessionStartRoute
 from routes.HelloWorld import HelloWorld
 from routes.SessionJoinRoute import SessionJoinRoute
 from routes.SessionPlayerList import SessionPlayerList
@@ -35,6 +36,7 @@ api.add_resource(SessionPlayerList, '/session/playerlist')
 api.add_resource(SessionJoinRoute, '/session/join')
 api.add_resource(UserRoute, '/user')
 api.add_resource(GameGo, '/session/game/go')
+api.add_resource(SessionStartRoute, '/session/start')
 
 
 # https://pypi.org/project/flask-expects-json/#:~:text=register()%3A%0A%20%20%20%20return-,Error%20handling,-On%20validation%20failure

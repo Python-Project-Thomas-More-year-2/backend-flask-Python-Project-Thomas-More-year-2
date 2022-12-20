@@ -18,6 +18,7 @@ class Session(db.Model):
     goReward = Column(Integer, nullable=False)
     freeParkingMoney = Column(Integer, nullable=False)
     freeParking = Column(Boolean, nullable=False)
+    started = Column(Boolean, nullable=False, default=False)
     users = relationship("User")
 
 
@@ -28,7 +29,6 @@ class User(db.Model):
     money = Column(Integer, nullable=False)
     name = Column(db.String(15), nullable=False)
     isHost = Column(Boolean, nullable=False)
-    isBank = Column(Boolean, nullable=False)
     socketConnection = Column(db.String(256), unique=True)
     socketSessionId = Column(String, nullable=True, unique=True)
     session = relationship("Session", back_populates="users")
@@ -45,13 +45,11 @@ class User(db.Model):
         u: User
         for u in User.query.filter_by(session_id=self.session_id).all():
             if u.socketSessionId is not None:
-                emit(event, data, to=u.socketSessionId)
+                emit(event, data, to=u.socketSessionId, namespace="/")
     
     def emit(self, event: str, data: dir):
-        u: User
-        u = User.query.filter_by(id=self.id).first()
-        if u.socketSessionId is not None:
-            emit(event, data, to=u.socketSessionId)
+        if self.socketSessionId is not None:
+            emit(event, data, to=self.socketSessionId, namespace="/")
 
     @staticmethod
     def generate_socket_connection_string() -> str:
