@@ -13,6 +13,7 @@ from routes.SessionJoinRoute import SessionJoinRoute
 from routes.SessionPlayerList import SessionPlayerList
 from routes.SessionRoute import SessionRoute
 from routes.UserRoute import UserRoute
+from routes.GameGo import GameGo
 
 app = Flask(__name__)
 api = Api(app)
@@ -34,6 +35,7 @@ api.add_resource(SessionRoute, '/session')
 api.add_resource(SessionPlayerList, '/session/playerlist')
 api.add_resource(SessionJoinRoute, '/session/join')
 api.add_resource(UserRoute, '/user')
+api.add_resource(GameGo, '/session/game/go')
 api.add_resource(SessionStartRoute, '/session/start')
 
 
