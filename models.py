@@ -14,7 +14,6 @@ class Session(db.Model):
     id = Column(Integer, primary_key=True)
     code = Column(String(7), nullable=False)
     startCapital = Column(Integer, nullable=False)
-    seeOthersBalance = Column(Boolean, nullable=False)
     goReward = Column(Integer, nullable=False)
     started = Column(Boolean, nullable=False, default=False)
     users = relationship("User")

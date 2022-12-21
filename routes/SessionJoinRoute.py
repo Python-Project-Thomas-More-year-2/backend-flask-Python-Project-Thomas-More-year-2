@@ -73,7 +73,6 @@ class SessionJoinRoute(Resource):
                 "id": ses.id,
                 "code": ses.code,
                 "startCapital": ses.startCapital,
-                "seeOthersBalance": ses.seeOthersBalance,
                 "goReward": ses.goReward,
                 "started": ses.started,
             },
