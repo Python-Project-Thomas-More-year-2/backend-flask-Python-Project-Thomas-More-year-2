@@ -64,6 +64,9 @@ class SessionPayRent(Resource):
         if not u.session.started:
             raise Conflict("Session has not started yet")
 
+        if u.id == user.id:
+            raise Conflict("You can't request money to yourself")
+
         t = Transaction(
             request_sender_id=user.id,
             request_payer_id=req["user"]["id"],
