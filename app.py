@@ -14,6 +14,7 @@ from routes.SessionPlayerList import SessionPlayerList
 from routes.SessionRoute import SessionRoute
 from routes.UserRoute import UserRoute
 from routes.GameGo import GameGo
+from routes.PropertyPurchase import PropertyPurchase
 
 app = Flask(__name__)
 api = Api(app)
@@ -37,6 +38,7 @@ api.add_resource(SessionJoinRoute, '/session/join')
 api.add_resource(UserRoute, '/user')
 api.add_resource(GameGo, '/session/game/go')
 api.add_resource(SessionStartRoute, '/session/start')
+api.add_resource(PropertyPurchase,'/session/game/property-purchase')
 
 
 # https://pypi.org/project/flask-expects-json/#:~:text=register()%3A%0A%20%20%20%20return-,Error%20handling,-On%20validation%20failure
