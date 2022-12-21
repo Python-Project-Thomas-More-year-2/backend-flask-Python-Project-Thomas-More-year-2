@@ -18,6 +18,7 @@ from routes.SessionRoute import SessionRoute
 from routes.SessionStartRoute import SessionStartRoute
 from routes.TransactionPayerRoute import TransactionPayerRoute
 from routes.TransactionSenderRoute import TransactionSenderRoute
+from routes.SessionTransactionBank import SessionTransactionBank
 from routes.UserRoute import UserRoute
 
 app = Flask(__name__)
@@ -44,8 +45,9 @@ api.add_resource(GameGo, '/session/game/go')
 api.add_resource(BankMoney, '/session/game/bank-money')
 api.add_resource(SessionStartRoute, '/session/start')
 api.add_resource(PropertyPurchase, '/session/game/property-purchase')
-api.add_resource(TransactionPayerRoute, '/session/game/transacions/payer')
 api.add_resource(SessionPayRent, '/session/game/pay-rent')
+api.add_resource(TransactionPayerRoute, '/session/game/transacions/payer')
+api.add_resource(SessionTransactionBank, '/session/game/transacions/bank')
 api.add_resource(TransactionSenderRoute, '/session/game/transactions/sender')
 
 
