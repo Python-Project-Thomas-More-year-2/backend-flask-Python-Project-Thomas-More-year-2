@@ -7,18 +7,17 @@ from flask_socketio import SocketIO, emit
 from jsonschema import ValidationError
 
 from models import db, User
-from routes.SessionStartRoute import SessionStartRoute
+from routes.GameGo import GameGo
+from routes.GameMoneyFromBank import BankMoney
 from routes.HelloWorld import HelloWorld
+from routes.PropertyPurchase import PropertyPurchase
 from routes.SessionJoinRoute import SessionJoinRoute
+from routes.SessionPayRent import SessionPayRent
 from routes.SessionPlayerList import SessionPlayerList
 from routes.SessionRoute import SessionRoute
-from routes.UserRoute import UserRoute
-from routes.GameGo import GameGo
-from routes.PropertyPurchase import PropertyPurchase
-from routes.GameMoneyFromBank import BankMoney
+from routes.SessionStartRoute import SessionStartRoute
 from routes.TransactionPayerRoute import TransactionPayerRoute
-from routes.PropertyPurchase import PropertyPurchase
-from routes.SessionPayRent import SessionPayRent
+from routes.UserRoute import UserRoute
 
 app = Flask(__name__)
 api = Api(app)
@@ -45,7 +44,6 @@ api.add_resource(BankMoney, '/session/game/bank-money')
 api.add_resource(SessionStartRoute, '/session/start')
 api.add_resource(PropertyPurchase, '/session/game/property-purchase')
 api.add_resource(TransactionPayerRoute, '/session/game/transacions/payer')
-api.add_resource(PropertyPurchase,'/session/game/property-purchase')
 api.add_resource(SessionPayRent, '/session/game/pay-rent')
 
 
