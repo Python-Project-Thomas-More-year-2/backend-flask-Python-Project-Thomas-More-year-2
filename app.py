@@ -17,6 +17,7 @@ from routes.SessionPlayerList import SessionPlayerList
 from routes.SessionRoute import SessionRoute
 from routes.SessionStartRoute import SessionStartRoute
 from routes.TransactionPayerRoute import TransactionPayerRoute
+from routes.TransactionSenderRoute import TransactionSenderRoute
 from routes.UserRoute import UserRoute
 
 app = Flask(__name__)
@@ -45,6 +46,7 @@ api.add_resource(SessionStartRoute, '/session/start')
 api.add_resource(PropertyPurchase, '/session/game/property-purchase')
 api.add_resource(TransactionPayerRoute, '/session/game/transacions/payer')
 api.add_resource(SessionPayRent, '/session/game/pay-rent')
+api.add_resource(TransactionSenderRoute, '/session/game/transactions/sender')
 
 
 # https://pypi.org/project/flask-expects-json/#:~:text=register()%3A%0A%20%20%20%20return-,Error%20handling,-On%20validation%20failure

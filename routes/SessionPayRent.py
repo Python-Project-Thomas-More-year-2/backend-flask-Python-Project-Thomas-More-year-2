@@ -47,6 +47,7 @@ schema_put = {
     "required": ["transaction"],
 }
 
+
 class SessionPayRent(Resource):
     @staticmethod
     @expects_json(schema_post)
@@ -64,16 +65,16 @@ class SessionPayRent(Resource):
             raise Conflict("Session has not started yet")
 
         t = Transaction(
-            request_sender_id = user.id,
-            request_payer_id = req["user"]["id"],
-            amount = req["transaction"]["amount"]
+            request_sender_id=user.id,
+            request_payer_id=req["user"]["id"],
+            amount=req["transaction"]["amount"]
         )
         db.session.add(t)
         db.session.commit()
 
         u.emit('transaction-requested-rent', {
-                "transaction":t.to_object()
-            })
+            "transaction": t.to_object()
+        })
 
         return {}, 200
 
@@ -84,19 +85,19 @@ class SessionPayRent(Resource):
 
         u = get_user_by_session(session, throw_unauthorized=True)
 
-        #Check if the user is the transaction.request_payer of the given transaction.id
+        # Check if the user is the transaction.request_payer of the given transaction.id
         t = Transaction.query.filter_by(id=req["transaction"]["id"], request_payer_id=u.id).first()
 
         if t is None:
             raise NotFound("Transaction not found")
 
-        #Check if user has enough money
+        # Check if user has enough money
         if u.money < t.amount:
             raise Conflict("User does not have enough money to afford this transaction")
-        
+
         u.money -= t.amount
         db.session.commit()
         u.emit_balance_update()
 
-       # Respond
+        # Respond
         return {}, 200
