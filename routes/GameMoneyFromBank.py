@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
-from werkzeug.exceptions import Conflict
+from werkzeug.exceptions import Conflict, NotFound
 
 from helpers.get_user_by_session import get_user_by_session
 from models import User, db
@@ -47,7 +47,7 @@ class BankMoney(Resource):
             id=req["user"]["id"], session_id=user.session_id).first()
 
         if u is None:
-            raise Conflict("User does not exist")
+            raise NotFound("User does not exist")
 
         if not u.session.started:
             raise Conflict("Session has not started yet")
