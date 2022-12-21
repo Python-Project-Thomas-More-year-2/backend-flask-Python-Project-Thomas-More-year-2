@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
-from werkzeug.exceptions import Conflict
+from werkzeug.exceptions import Conflict, NotFound
 
 from helpers.get_user_by_session import get_user_by_session
 from models import User, db, Transaction
@@ -23,7 +23,8 @@ schema_post = {
             "type": "object",
             "properties": {
                 "amount": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 }
             },
             "required": ["amount"],
@@ -61,7 +62,7 @@ class PropertyPurchase(Resource):
         #Check if user is logged in
         u = User.query.filter_by(id=req["user"]["id"], session_id=user.session_id).first()
         if u is None:
-            raise Conflict("User does not exist")
+            raise NotFound("User does not exist")
 
         #check if session has started
         if not u.session.started:
@@ -77,7 +78,7 @@ class PropertyPurchase(Resource):
         db.session.commit()
 
         #send transaction-object to transaction.request_payer
-        u.emit_to_session('transaction-requested', {
+        u.emit('transaction-requested', {
                 "transaction":t.to_object()
             })
 
@@ -90,12 +91,14 @@ class PropertyPurchase(Resource):
     def put():
         req = request.get_json()
 
+        user = get_user_by_session(session, throw_unauthorized=True)
+
         #Check if the user is the transaction.request_payer of the given transaction.id
-        t = Transaction.query.filter_by(id=req["transaction"]["id"]).first()
+        t = Transaction.query.filter_by(id=req["transaction"]["id"], request_payer_id=user.id).first()
         u = User.query.filter_by(id=t.request_payer_id).first()
 
         if t is None:
-            raise Conflict("Wrong user")
+            raise NotFound("transaction not found")
 
         #Check if user has enough money
         if u.money < t.amount:
@@ -103,6 +106,7 @@ class PropertyPurchase(Resource):
 
         u.money -= t.amount
         db.session.commit()
+        u.emit_balance_update()
 
        # Respond
         return {
