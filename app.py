@@ -14,6 +14,7 @@ from routes.SessionPlayerList import SessionPlayerList
 from routes.SessionRoute import SessionRoute
 from routes.UserRoute import UserRoute
 from routes.GameGo import GameGo
+from routes.PropertyPurchase import PropertyPurchase
 from routes.GameMoneyFromBank import BankMoney
 from routes.PropertyPurchase import PropertyPurchase
 from routes.SessionPayRent import SessionPayRent

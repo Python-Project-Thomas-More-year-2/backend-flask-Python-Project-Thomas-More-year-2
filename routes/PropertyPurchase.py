@@ -61,6 +61,7 @@ class PropertyPurchase(Resource):
 
         #Check if user is logged in
         u = User.query.filter_by(id=req["user"]["id"], session_id=user.session_id).first()
+
         if u is None:
             raise NotFound("User does not exist")
 
@@ -98,6 +99,7 @@ class PropertyPurchase(Resource):
 
         if t is None:
             raise NotFound("transaction not found")
+
 
         #Check if user has enough money
         if u.money < t.amount:

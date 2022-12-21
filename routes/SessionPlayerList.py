@@ -38,12 +38,14 @@ class SessionPlayerList(Resource):
         if user.id == req["user"]["id"]:
             raise BadRequest("You can not kick yourself")
 
-        query = User.query.filter_by(id=req["user"]["id"], session_id=user.session_id)
+        query = User.query.filter_by(
+            id=req["user"]["id"], session_id=user.session_id)
 
         kicked_users = query.all()
 
         for u in kicked_users:
             if u.socketSessionId is not None:
+                u.emit("kick", {})
                 disconnect(sid=u.socketSessionId, namespace="/")
 
         query.delete()
