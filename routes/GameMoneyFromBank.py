@@ -55,9 +55,6 @@ class BankMoney(Resource):
         u.money += req["transaction"]["amount"]
         db.session.commit()
 
-        user.emit('user-balance-update', {
-            "user": {
-                "id": u.id
-            }})
+        user.emit_balance_update()
 
         return {}, 200
