@@ -179,6 +179,7 @@ class SessionRoute(Resource):
             kicked_users = query.all()
 
             for u in kicked_users:
+                u.emit("kick", {})
                 u.disconnect_socket()
 
             query.delete()
