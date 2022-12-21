@@ -30,6 +30,8 @@ class User(db.Model):
     socketConnection = Column(db.String(256), unique=True)
     socketSessionId = Column(String, nullable=True, unique=True)
     session = relationship("Session", back_populates="users")
+    transaction_payer = relationship("Transaction", back_populates="request_payer", foreign_keys="Transaction.request_payer_id")
+    transaction_sender = relationship("Transaction", back_populates="request_sender", foreign_keys="Transaction.request_sender_id")
 
     def assert_is_host(self):
         if not self.isHost:
@@ -60,3 +62,20 @@ class User(db.Model):
                 break
 
         return rand
+
+class Transaction(db.Model):
+    __tablename__ = "transaction"
+    id = Column(Integer, primary_key=True)
+    request_sender_id = Column(Integer, ForeignKey("user.id"), nullable=True)
+    request_payer_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    request_sender = relationship("User", back_populates="transaction_sender", foreign_keys=[request_sender_id])
+    request_payer = relationship("User", back_populates="transaction_payer", foreign_keys=[request_payer_id])
+    amount = Column(Integer, nullable=False)
+
+    def to_object(self):
+        return {
+            "id":self.id,
+            "request_payer_id":self.request_payer_id,
+            "request_sender_id":self.request_sender_id,
+            "amount":self.amount
+        }
