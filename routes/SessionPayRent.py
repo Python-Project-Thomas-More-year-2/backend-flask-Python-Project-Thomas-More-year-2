@@ -86,7 +86,7 @@ class SessionPayRent(Resource):
         u = get_user_by_session(session, throw_unauthorized=True)
 
         # Check if the user is the transaction.request_payer of the given transaction.id
-        t = Transaction.query.filter_by(id=req["transaction"]["id"], request_payer_id=u.id).first()
+        t: Transaction = Transaction.query.filter_by(id=req["transaction"]["id"], request_payer_id=u.id).first()
 
         if t is None:
             raise NotFound("Transaction not found")
@@ -96,6 +96,8 @@ class SessionPayRent(Resource):
             raise Conflict("User does not have enough money to afford this transaction")
 
         u.money -= t.amount
+        t.request_sender.money += t.amount
+        db.session.delete(t)
         db.session.commit()
         u.emit_balance_update()
 
