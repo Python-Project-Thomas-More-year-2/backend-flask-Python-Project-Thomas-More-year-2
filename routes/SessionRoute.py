@@ -181,6 +181,11 @@ class SessionRoute(Resource):
             query.delete()
             db.session.delete(ses)
         else:
+            transaction: Transaction
+            for transaction in user.transaction_sender:
+                db.session.delete(transaction)
+            for transaction in user.transaction_payer:
+                db.session.delete(transaction)
             user.disconnect_socket()
             db.session.delete(user)
 
