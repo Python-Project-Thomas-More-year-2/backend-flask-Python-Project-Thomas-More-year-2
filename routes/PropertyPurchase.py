@@ -91,11 +91,10 @@ class PropertyPurchase(Resource):
     def put():
         req = request.get_json()
 
-        user = get_user_by_session(session, throw_unauthorized=True)
+        u = get_user_by_session(session, throw_unauthorized=True)
 
         #Check if the user is the transaction.request_payer of the given transaction.id
-        t = Transaction.query.filter_by(id=req["transaction"]["id"], request_payer_id=user.id).first()
-        u = User.query.filter_by(id=t.request_payer_id).first()
+        t = Transaction.query.filter_by(id=req["transaction"]["id"], request_payer_id=u.id).first()
 
         if t is None:
             raise NotFound("transaction not found")
