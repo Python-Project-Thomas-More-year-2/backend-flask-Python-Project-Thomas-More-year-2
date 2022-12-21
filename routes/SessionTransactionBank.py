@@ -1,8 +1,10 @@
-from flask import session
+from flask import request, session
+from flask_expects_json import expects_json
 from flask_restful import Resource
+from werkzeug.exceptions import Conflict, NotFound
 
 from helpers.get_user_by_session import get_user_by_session
-from models import Transaction
+from models import User, db, Transaction
 
 
 class SessionTransactionBank(Resource):
@@ -12,5 +14,4 @@ class SessionTransactionBank(Resource):
 
         user.assert_is_host()
 
-        t: Transaction
-        return [t.to_object() for t in user.transaction_sender], 200
+        return [t.to_object() for t in Transaction.query.filter_by(request_sender_id=None).all()], 200
