@@ -4,7 +4,7 @@ from flask_restful import Resource
 from werkzeug.exceptions import Conflict
 
 from helpers.get_user_by_session import get_user_by_session
-from models import Session, User, db
+from models import User, db
 
 schema_post = {
     "type": "object",
@@ -19,9 +19,12 @@ schema_post = {
             "required": ["id"],
         },
         "transaction": {
-            "amount": {
-                "type": "integer",
-                "minimum": 1,
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer",
+                    "minimum": 1,
+                },
             },
             "required": ["amount"],
         },
@@ -49,14 +52,11 @@ class BankMoney(Resource):
         if not u.session.started:
             raise Conflict("Session has not started yet")
 
-        u.money += int(req["transaction"]["amount"])
+        u.money += req["transaction"]["amount"]
         db.session.commit()
 
         if u.session.seeOthersBalance:
-            user.emit_to_session('user-balance-update', {
-                "user": {
-                    "id": u.id
-                }})
+            user.emit_balance_update()
         else:
             user.emit('user-balance-update', {
                 "user": {

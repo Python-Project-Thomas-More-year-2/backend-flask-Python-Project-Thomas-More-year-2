@@ -37,7 +37,7 @@ api.add_resource(SessionPlayerList, '/session/playerlist')
 api.add_resource(SessionJoinRoute, '/session/join')
 api.add_resource(UserRoute, '/user')
 api.add_resource(GameGo, '/session/game/go')
-api.add_resource(BankMoney, '/session/game/bankMoney')
+api.add_resource(BankMoney, '/session/game/bank-money')
 api.add_resource(SessionStartRoute, '/session/start')
 
 
