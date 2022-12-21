@@ -167,26 +167,22 @@ class SessionRoute(Resource):
         if user.isHost:
             ses = user.session
             query = User.query.filter_by(session_id=user.session_id)
-            transactions = Transaction.query.all()
             kicked_users = query.all()
 
             for u in kicked_users:
+                transaction: Transaction
+                for transaction in u.transaction_sender:
+                    db.session.delete(transaction)
+                for transaction in u.transaction_payer:
+                    db.session.delete(transaction)
                 u.emit("kick", {})
                 u.disconnect_socket()
 
             query.delete()
             db.session.delete(ses)
-            db.session.delete(transactions)
         else:
             user.disconnect_socket()
-
-            # get all transactions linked to the user
-            transactionSender = Transaction.query.filter_by(request_sender_id=user.id)
-            transactionPayer = Transaction.query.filter_by(request_payer_id=user.id)
-
             db.session.delete(user)
-            db.session.delete(transactionSender)
-            db.session.delete(transactionPayer)
 
         db.session.commit()
         session.pop("user_id")

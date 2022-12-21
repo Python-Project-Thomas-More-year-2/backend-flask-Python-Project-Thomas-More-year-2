@@ -5,7 +5,7 @@ from flask_socketio import disconnect
 from werkzeug.exceptions import BadRequest
 
 from helpers.get_user_by_session import get_user_by_session
-from models import db, User
+from models import db, User, Transaction
 
 schema_delete = {
     "type": "object",
@@ -43,7 +43,13 @@ class SessionPlayerList(Resource):
 
         kicked_users = query.all()
 
+        u: User
         for u in kicked_users:
+            transaction: Transaction
+            for transaction in u.transaction_sender:
+                db.session.delete(transaction)
+            for transaction in u.transaction_payer:
+                db.session.delete(transaction)
             if u.socketSessionId is not None:
                 u.emit("kick", {})
                 disconnect(sid=u.socketSessionId, namespace="/")
