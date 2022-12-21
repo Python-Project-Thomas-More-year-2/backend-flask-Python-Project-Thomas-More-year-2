@@ -1,10 +1,10 @@
 from flask import request, session
 from flask_expects_json import expects_json
 from flask_restful import Resource
-from werkzeug.exceptions import Conflict
+from werkzeug.exceptions import Conflict, NotFound
 
 from helpers.get_user_by_session import get_user_by_session
-from models import Session, User, db
+from models import User, db
 
 schema_post = {
     "type": "object",
@@ -22,6 +22,7 @@ schema_post = {
     "required": ["user"],
 }
 
+
 class GameGo(Resource):
     @staticmethod
     @expects_json(schema_post)
@@ -32,10 +33,11 @@ class GameGo(Resource):
 
         user.assert_is_host()
 
-        u = User.query.filter_by(id=req["user"]["id"], session_id=user.session_id).first()
+        u = User.query.filter_by(
+            id=req["user"]["id"], session_id=user.session_id).first()
 
         if u is None:
-            raise Conflict("User does not exist")
+            raise NotFound("User does not exist")
 
         if not u.session.started:
             raise Conflict("Session has not started yet")
@@ -43,15 +45,6 @@ class GameGo(Resource):
         u.money += u.session.goReward
         db.session.commit()
 
-        if u.session.seeOthersBalance:
-            user.emit_to_session('user-balance-update', {
-                "user": {
-                    "id": u.id
-                }})
-        else:
-            user.emit('user-balance-update', {
-                "user": {
-                    "id": u.id
-                }})
+        user.emit_balance_update()
 
         return {}, 200
