@@ -5,7 +5,7 @@ from werkzeug.exceptions import Conflict
 
 from helpers.generate_random_string import generate_random_string
 from helpers.get_user_by_session import get_user_by_session
-from models import db, Session, User
+from models import db, Session, User, Transaction
 
 schema_post = {
     "type": "object",
@@ -170,6 +170,11 @@ class SessionRoute(Resource):
             kicked_users = query.all()
 
             for u in kicked_users:
+                transaction: Transaction
+                for transaction in u.transaction_sender:
+                    db.session.delete(transaction)
+                for transaction in u.transaction_payer:
+                    db.session.delete(transaction)
                 u.emit("kick", {})
                 u.disconnect_socket()
 
@@ -177,7 +182,6 @@ class SessionRoute(Resource):
             db.session.delete(ses)
         else:
             user.disconnect_socket()
-
             db.session.delete(user)
 
         db.session.commit()
