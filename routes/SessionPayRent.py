@@ -96,7 +96,8 @@ class SessionPayRent(Resource):
             raise Conflict("User does not have enough money to afford this transaction")
 
         u.money -= t.amount
-        t.request_sender.money += t.amount
+        if t.request_sender is not None:
+            t.request_sender.money += t.amount
         db.session.delete(t)
         db.session.commit()
         u.emit_balance_update()
