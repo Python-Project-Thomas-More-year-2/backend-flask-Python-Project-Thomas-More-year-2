@@ -22,6 +22,7 @@ schema_post = {
     "required": ["user"],
 }
 
+
 class GameGo(Resource):
     @staticmethod
     @expects_json(schema_post)
@@ -32,7 +33,8 @@ class GameGo(Resource):
 
         user.assert_is_host()
 
-        u = User.query.filter_by(id=req["user"]["id"], session_id=user.session_id).first()
+        u = User.query.filter_by(
+            id=req["user"]["id"], session_id=user.session_id).first()
 
         if u is None:
             raise Conflict("User does not exist")
@@ -43,15 +45,9 @@ class GameGo(Resource):
         u.money += u.session.goReward
         db.session.commit()
 
-        if u.session.seeOthersBalance:
-            user.emit_to_session('user-balance-update', {
-                "user": {
-                    "id": u.id
-                }})
-        else:
-            user.emit('user-balance-update', {
-                "user": {
-                    "id": u.id
-                }})
+        user.emit('user-balance-update', {
+            "user": {
+                "id": u.id
+            }})
 
         return {}, 200

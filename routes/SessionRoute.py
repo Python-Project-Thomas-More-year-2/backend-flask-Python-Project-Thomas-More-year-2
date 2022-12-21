@@ -36,9 +36,6 @@ schema_patch = {
                     "type": "integer",
                     "minimum": 0,
                 },
-                "seeOthersBalance": {
-                    "type": "boolean",
-                },
                 "goReward": {
                     "type": "integer",
                     "minimum": 0,
@@ -46,7 +43,6 @@ schema_patch = {
             },
             "required": [
                 "startCapital",
-                "seeOthersBalance",
                 "goReward",
             ],
         },
@@ -69,7 +65,6 @@ class SessionRoute(Resource):
                 "id": user.session.id,
                 "code": user.session.code,
                 "startCapital": user.session.startCapital,
-                "seeOthersBalance": user.session.seeOthersBalance,
                 "goReward": user.session.goReward,
                 "started": user.session.started,
             }
@@ -93,7 +88,6 @@ class SessionRoute(Resource):
         ses = Session(
             code=code,
             startCapital=1500,
-            seeOthersBalance=True,
             goReward=200
         )
 
@@ -123,7 +117,6 @@ class SessionRoute(Resource):
                 "id": ses.id,
                 "code": ses.code,
                 "startCapital": ses.startCapital,
-                "seeOthersBalance": ses.seeOthersBalance,
                 "goReward": ses.goReward,
                 "started": ses.started,
             },
@@ -150,7 +143,6 @@ class SessionRoute(Resource):
         req = request.get_json()
 
         user.session.startCapital = req["session"]["startCapital"]
-        user.session.seeOthersBalance = req["session"]["seeOthersBalance"]
         user.session.goReward = req["session"]["goReward"]
 
         db.session.commit()
@@ -163,7 +155,6 @@ class SessionRoute(Resource):
                 "id": ses.id,
                 "code": ses.code,
                 "startCapital": ses.startCapital,
-                "seeOthersBalance": ses.seeOthersBalance,
                 "goReward": ses.goReward,
                 "started": ses.started,
             }
