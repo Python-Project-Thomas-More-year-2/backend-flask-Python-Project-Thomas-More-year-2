@@ -47,6 +47,9 @@ class User(db.Model):
             if u.socketSessionId is not None:
                 emit(event, data, to=u.socketSessionId, namespace="/")
 
+    def emit_balance_update(self):
+        self.emit_to_session('user-balance-update', {"user": {"id": self.id}})
+
     def emit(self, event: str, data: dir):
         if self.socketSessionId is not None:
             emit(event, data, to=self.socketSessionId, namespace="/")

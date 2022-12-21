@@ -15,6 +15,7 @@ from routes.SessionRoute import SessionRoute
 from routes.UserRoute import UserRoute
 from routes.GameGo import GameGo
 from routes.PropertyPurchase import PropertyPurchase
+from routes.GameMoneyFromBank import BankMoney
 
 app = Flask(__name__)
 api = Api(app)
@@ -37,6 +38,7 @@ api.add_resource(SessionPlayerList, '/session/playerlist')
 api.add_resource(SessionJoinRoute, '/session/join')
 api.add_resource(UserRoute, '/user')
 api.add_resource(GameGo, '/session/game/go')
+api.add_resource(BankMoney, '/session/game/bank-money')
 api.add_resource(SessionStartRoute, '/session/start')
 api.add_resource(PropertyPurchase,'/session/game/property-purchase')
 
@@ -78,7 +80,8 @@ def auth(json):
     # user exists
 
     # delete other connection if exist
-    user_prev_connection: User | None = User.query.filter_by(socketSessionId=request.sid).first()
+    user_prev_connection: User | None = User.query.filter_by(
+        socketSessionId=request.sid).first()
     if user_prev_connection is not None:
         user_prev_connection.socketSessionId = None
         db.session.commit()
@@ -100,7 +103,8 @@ def auth(json):
 
 @socketio.on('disconnect')
 def disconnect():
-    user_prev_connection: User | None = User.query.filter_by(socketSessionId=request.sid).first()
+    user_prev_connection: User | None = User.query.filter_by(
+        socketSessionId=request.sid).first()
 
     if user_prev_connection is None:
         return
