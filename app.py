@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+import psycopg2
 from flask import Flask, make_response, jsonify, request
 from flask_cors import CORS
 from flask_restful import Api
@@ -27,7 +28,7 @@ socketio = SocketIO(app, cors_allowed_origins="*", manage_session=False)
 
 CORS(app, resource={"*": {"origins": "*"}}, supports_credentials=True)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://user:password@127.0.0.1:5432/application"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://user:password@db:5432/application"
 app.config["SECRET_KEY"] = "A_SECRET_KEY"  # Change in build
 app.permanent_session_lifetime = timedelta(days=1)
 
@@ -129,4 +130,16 @@ def disconnect():
 
 if __name__ == "__main__":
     # app.run(debug=True)
-    socketio.run(app, debug=True)
+    import time
+
+    while True:
+        try:
+            conn = psycopg2.connect("dbname='application' user='user' host='db' password='password' connect_timeout=1")
+            conn.close()
+            print("Database active")
+            break
+        except:
+            print("Database not active")
+            time.sleep(1)
+
+    socketio.run(app, port=5000, debug=True, host="0.0.0.0")

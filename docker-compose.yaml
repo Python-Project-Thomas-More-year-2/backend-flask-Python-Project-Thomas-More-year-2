@@ -7,7 +7,14 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: application
-    volumes:
-      - ./db:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  flask-server:
+    build: .
+    links:
+      - db
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
